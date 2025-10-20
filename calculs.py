@@ -3,18 +3,17 @@ import pandas as pd
 
 
 class Calculs:
-    # --- MODIFICATION: Added 'reverse' flag to the constructor ---
     def __init__(self, n, ds, bezier_iterations=4, reverse=False):
-        self.n = n # nombre de côté
-        self.ds = ds # décalage
-        self.ns = np.arange(3, self.n + 1) # les polygones de 3 côtés à n côtés
-        self.bezier_iterations = bezier_iterations # Number of subdivisions for the Bezier curve
+        self.n = n # number of sides of the largest polygon
+        self.ds = ds # offset
+        self.ns = np.arange(3, self.n + 1) # 3-gon to n-gon
+        self.bezier_iterations = bezier_iterations # number of subdivisions for the Bezier curve
         self.reverse = reverse # Flag for reversing rotation
 
         self.get_info()
         
     def get_info(self):
-        self.a = self.get_vertex() # longueur côtés
+        self.a = self.get_vertex() # side length
 
         self.in_radii = self.get_inner_circle_radius()
         self.out_radii = self.get_outer_circle_radius()
@@ -42,7 +41,6 @@ class Calculs:
         return round(a, 2)
 
     def get_inner_circle_radius(self):
-        # rayon inscrit
         inner_radius = []
         for i in self.ns:
             r = round(0.5 * self.a * (1 / np.tan(np.pi / i)), 2)
@@ -50,7 +48,6 @@ class Calculs:
         return inner_radius
 
     def get_outer_circle_radius(self):
-        # rayon circonscrit
         outer_radius = []
         for i in self.ns:
             R = round(0.5 * self.a * (1 / np.sin(np.pi / i)), 1)
@@ -96,7 +93,7 @@ class Calculs:
             else:
                 rot = val
             
-            # Apply reverse logic
+            # option reverse
             if self.reverse:
                 rots_fin.append(-1 * rot)
             else:
@@ -107,25 +104,13 @@ class Calculs:
         
         return delta_rho, somme_delta_rho, rots_fin
 
-    # --- MODIFICATION: Area calculation function is no longer needed ---
-    # def get_aires(self):
-    #     # aire du plus grand polygone
-    #     aires = []
-    #     for i in self.ns:
-    #         aire = 0.25 * i * self.a ** 2 * (1 / np.tan(np.pi / i))
-    #         aires.append(round(aire, 2))
-    #     return aires
-    # --- END MODIFICATION ---
 
-    # --- MODIFICATION: Updated Pi approximation method ---
     def get_approx_pi(self):
         approx_pis = []
-        # Formula: pi ≈ n * sin(pi / n) where n is the number of sides
         for i in self.ns:
             pi_approx = i * np.sin(np.pi / i)
-            approx_pis.append(round(pi_approx, 10)) # Increased precision
+            approx_pis.append(round(pi_approx, 10)) 
         return approx_pis
-    # --- END MODIFICATION ---
 
     def get_polygons(self):
         polygons = []
@@ -165,8 +150,8 @@ class Calculs:
                 dx = ux - vx
                 d = round(self.get_distance(dx, dy), 2)
                 angle = np.arctan2(dy, dx)
-                trans_x = round(d * np.cos(angle), 2)    # idem que dx
-                trans_y = round(d * np.sin(angle), 2)    # idem que dy
+                trans_x = round(d * np.cos(angle), 2)    
+                trans_y = round(d * np.sin(angle), 2)    
                 dist_x.append(trans_x)
                 dist_y.append(trans_y)
             ind -= 1
@@ -201,20 +186,17 @@ class Calculs:
         return xs, ys
 
     def get_dict_1(self):
-        # --- MODIFICATION: Removed "Aire" ---
         dict_1 = {
-            "Rayon interne": self.in_radii,
-            "Rayon externe": self.out_radii,
-            "Angle interne": self.inner_angles,
-            "Angle externe": self.outer_angles,
+            "Inner radius": self.in_radii,
+            "Outer radius": self.out_radii,
+            "Inner angle": self.inner_angles,
+            "Outer angle": self.outer_angles,
             "Delta rho": self.d_rho,
-            "Somme delta rho": self.sd_rho,
-            "Rotation finale": self.rots,
+            "Sum delta rho": self.sd_rho,
+            "Final rotation": self.rots,
             "Distances": self.hyps,
-            # "Aire": self.aires, # Removed
             "Pi approx.": self.pis
             }
-        # --- END MODIFICATION ---
         return dict_1
 
     def get_dict_2(self):
@@ -277,33 +259,33 @@ class Calculs:
     def get_courbe_bezier(self, subdivisions):
         if subdivisions < 0:
             return []
-        nombre_de_subdivisions = subdivisions
+        number_of_subdivisions = subdivisions
         complets = []
         for courbe in self.pts:
             segments = [courbe]
             subdivision = 0
 
-            while subdivision < nombre_de_subdivisions:
-                nouveaux_segments = []
+            while subdivision < number_of_subdivisions:
+                new_segments = []
                 for segment in segments:
-                    milieu1_x = (segment[0][0] + segment[1][0]) / 2
-                    milieu1_y = (segment[0][1] + segment[1][1]) / 2
-                    milieu1 = (milieu1_x, milieu1_y)
+                    mid1_x = (segment[0][0] + segment[1][0]) / 2
+                    mid1_y = (segment[0][1] + segment[1][1]) / 2
+                    mid1 = (mid1_x, mid1_y)
 
-                    milieu2_x = (segment[1][0] + segment[2][0]) / 2
-                    milieu2_y = (segment[1][1] + segment[2][1]) / 2
-                    milieu2 = (milieu2_x, milieu2_y)
+                    mid2_x = (segment[1][0] + segment[2][0]) / 2
+                    mid2_y = (segment[1][1] + segment[2][1]) / 2
+                    mid2 = (mid2_x, mid2_y)
 
-                    milieu_final_x = (milieu1[0] + milieu2[0]) / 2
-                    milieu_final_y = (milieu1[1] + milieu2[1]) / 2
-                    milieu_final = (milieu_final_x, milieu_final_y)
+                    final_mid_x = (mid1[0] + mid2[0]) / 2
+                    final_mid_y = (mid1[1] + mid2[1]) / 2
+                    final_mid = (final_mid_x, final_mid_y)
 
-                    nouveaux_segments.append((segment[0], milieu1, milieu_final))
-                    nouveaux_segments.append((milieu_final, milieu2, segment[2]))
+                    new_segments.append((segment[0], mid1, final_mid))
+                    new_segments.append((final_mid, mid2, segment[2]))
 
-                segments = nouveaux_segments
+                segments = new_segments
                 subdivision += 1
-                if subdivision == nombre_de_subdivisions:
+                if subdivision == number_of_subdivisions:
                     complets.append(segments)
         
         bezier_pts = []
