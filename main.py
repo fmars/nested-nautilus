@@ -639,15 +639,13 @@ def main():
     # Gallery Tab 
     with tabs[3]:
         st.header("Image Gallery")
-        images_path = [f"image{i}.jpg" for i in range(1, 22)]
+        images_path = [f"./gallery/image{i}.jpg" for i in range(1, 22)]
 
-        k = 0
-        for i in range(7): # 6 rows
+        for i in range(0, len(images_path), 3): # rows
             cols = st.columns(3)
             for j in range(3): # 3 columns
                 with cols[j]:
-                    st.image(images_path[k], width=200)
-                    k += 1
+                    st.image(images_path[i + j], width=200)
 
     # Help Tab
     with tabs[4]:
