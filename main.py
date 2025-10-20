@@ -469,10 +469,10 @@ def main():
 
 
     tabs = st.tabs([
-        "🖼️ Generator", "🔬 Bezier Playground", "📊 Data", "🏞️ Gallery", "❓ Help", "📜 Paper"
+        "Generator", "Bézier Playground", "Data", "Gallery", "Help", "Paper"
     ])
 
-    # --- Art Generator Tab ---
+
     with tabs[0]:
         if generate_button:
             info_dict = {
@@ -517,9 +517,9 @@ def main():
              st.info("Adjust the settings in the sidebar and click 'Generate' to create your image.")
 
 
-    # --- Bezier Playground Tab ---
+    # Generator tab
     with tabs[1]:
-        st.header("Bezier Curve Playground")
+        st.header("Bézier Curve Playground")
         
         # Controls above the plot
         n_poly = st.slider("Number of sides (n)", 3, 20, 15, key="n_bezier")
@@ -527,7 +527,7 @@ def main():
         iter_bezier = st.slider("Bezier Subdivisions", 0, 8, 4, key="iter_bezier", help="Number of recursive subdivisions (0 = control points only).")
         show_controls = st.checkbox("Show Control Points", value=True)
 
-        try: # Wrap calculation and plotting in try-except
+        try:
             data_bezier = Calculs(n=n_poly, ds=ds_bezier, bezier_iterations=iter_bezier)
             
             # Calculate plot limits safely
@@ -604,26 +604,21 @@ def main():
                 ax_bezier.plot(x_center, plot_lims[1], "^", color='black', clip_on=False)
             ax_bezier.legend()
             
-            # Plot below controls
             st.pyplot(fig_bezier) 
 
         except Exception as e:
             st.error(f"Error in Bezier Playground: {e}")
 
     
-    # --- Data Tab (now tabs[2]) ---
+    # Data tab
     with tabs[2]:
-        st.header("Generated Data Viewer")
-        # --- MODIFICATION: Added rounding and safety check ---
+        st.header("Data Viewer")
+
         if 'data' in st.session_state and st.session_state.data is not None:
             st.markdown("### General Polygon Information")
             # Check if df_1 exists and is a DataFrame
             if hasattr(st.session_state.data, 'df_1') and isinstance(st.session_state.data.df_1, pd.DataFrame):
                  df1_to_display = st.session_state.data.df_1.copy() # Work on a copy
-                 # Safely drop 'Aire' if it exists
-                 if 'Aire' in df1_to_display.columns:
-                      df1_to_display = df1_to_display.drop(columns=['Aire'])
-                 # Apply rounding only to numeric columns
                  numeric_cols_df1 = df1_to_display.select_dtypes(include=np.number).columns
                  st.dataframe(df1_to_display)
             else:
@@ -633,16 +628,15 @@ def main():
              # Check if df_2 exists and is a DataFrame
             if hasattr(st.session_state.data, 'df_2') and isinstance(st.session_state.data.df_2, pd.DataFrame):
                  df2_to_display = st.session_state.data.df_2.copy() # Work on a copy
-                 # Apply rounding only to numeric columns
                  numeric_cols_df2 = df2_to_display.select_dtypes(include=np.number).columns
                  st.dataframe(df2_to_display)
             else:
                   st.warning("Polygon vertex coordinate data (df_2) is not available or invalid.")
         else:
             st.info("Generate an image in the 'Generator' tab to see its data here.")
-        # --- END MODIFICATION ---
 
-    # --- Gallery Tab (now tabs[3], 18 images) ---
+    
+    # Gallery Tab 
     with tabs[3]:
         st.header("Image Gallery")
         
@@ -651,10 +645,9 @@ def main():
             for j in range(3): # 3 columns
                 with cols[j]:
                     random_id = i * 3 + j + 1
-                    # Added width to potentially control image size better in columns
                     st.image(f"https://picsum.photos/400/400?random={random_id}", caption=f"Random Art {random_id}", width=200)
 
-    # --- Help Tab (now tabs[4], with images) ---
+    # Help Tab
     with tabs[4]:
         st.header("Help & Instructions")
         st.markdown("---")
@@ -688,17 +681,16 @@ def main():
             st.markdown("This button will appear below `Generate` after having generated a figure. The picture will be saved as a PNG file.")
 
 
-    # --- Paper Tab (now tabs[5]) ---
+    # Paper Tab
     with tabs[5]:
         st.header("Paper")
         try:
-            with open("sample.pdf", "rb") as f:
+            with open("nautilus-polygon.pdf", "rb") as f:
                 base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-            # Set a fixed height or max-height for better embedding
             pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800px" type="application/pdf" style="border: none;"></iframe>'
             st.markdown(pdf_display, unsafe_allow_html=True)
         except FileNotFoundError:
-            st.warning("`sample.pdf` not found. Please add the PDF file to the project folder to display it here.")
+            st.warning("`nautilus-polygon.pdf` not found.")
         except Exception as e:
              st.error(f"Error loading PDF: {e}")
 
