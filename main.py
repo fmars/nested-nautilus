@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
-# Use non-interactive backend for Streamlit compatibility
+
 mpl.use('Agg') 
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
