@@ -10,15 +10,14 @@ from random import random, randint
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import LineCollection, PatchCollection
 from io import BytesIO
-import base64 # Required to embed PDFs
+import base64 # To embed pdf
 
-# This class must be in a file named calculs.py in the same directory
 from calculs import Calculs
+
 
 class Plotter:
     """
-    Handles all the plotting logic for the Streamlit application.
-    This class is adapted from the original GUI and terminal versions.
+    Plot the figure with matplotlib and create different sections in the Streamlit app.
     """
     def __init__(self, info):
         self.info = info
@@ -54,7 +53,7 @@ class Plotter:
         self.init_flags()
         self.thickness_inv_sqrt()
 
-        # --- Color Theme Logic ---
+        # Color theme
         color_map_name = self.info["theme"] 
         color_map_dict = {
             "Flag": "flag", "Spectrum": "jet", "Twilight": "twilight",
@@ -66,48 +65,39 @@ class Plotter:
         num_bezier_pts = max(1, len(self.data.bezier_pts)) if hasattr(self.data, 'bezier_pts') else 0
 
 
-        try: # Wrap colormap generation in try-except
+        try: # Generate the colormaps
             if color_map_name == "Random 1":
                 all_cmaps = plt.colormaps()
-                # --- MODIFICATION: Filter out qualitative and reversed ---
+                # Filter out qualitative and reversed colormaps 
                 quantitative_cmaps = { 
                     'Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2',
                     'Set1', 'Set2', 'Set3', 'tab10', 'tab20', 'tab20b', 'tab20c'
                 }
                 valid_cmaps = list(filter(
-                    lambda c: not c.endswith('_r') and c not in quantitative_cmaps, 
-                    all_cmaps
+                    lambda c: not c.endswith('_r') and c not in quantitative_cmaps, all_cmaps
                 ))
-                # --- END MODIFICATION ---
-                if not valid_cmaps: # Fallback if filtering removes all
-                     valid_cmaps = all_cmaps
                 rand_cmap_name = valid_cmaps[randint(0, len(valid_cmaps) - 1)]
-                # --- MODIFICATION: Use plt.colormaps.get_cmap ---
                 cmap = plt.colormaps.get_cmap(rand_cmap_name) 
-                # --- END MODIFICATION ---
             elif color_map_name == "Random 2":
                 self.random_color_dict()
                 cmap = LinearSegmentedColormap("random_cmap", self.cdict)
             else:
                 cmap_name = color_map_dict.get(color_map_name, "jet") 
-                 # --- MODIFICATION: Use plt.colormaps.get_cmap ---
                 cmap = plt.colormaps.get_cmap(cmap_name)
-                 # --- END MODIFICATION ---
 
-            # Generate colors only if num_polygons/num_bezier_pts > 0
             colors = cmap(np.linspace(0.2, 1, num_polygons)) if num_polygons > 0 else []
             colors2 = cmap(np.linspace(0.2, 1, num_bezier_pts)) if num_bezier_pts > 0 else []
 
         except Exception as e:
              st.error(f"Error getting colormap '{color_map_name}': {e}")
-             # Fallback to default colors if cmap fails
+             # Come back to default colors if failed
              default_cmap = plt.colormaps.get_cmap("jet")
              colors = default_cmap(np.linspace(0.2, 1, num_polygons)) if num_polygons > 0 else []
              colors2 = default_cmap(np.linspace(0.2, 1, num_bezier_pts)) if num_bezier_pts > 0 else []
 
-        # --- Call all individual plotting methods (wrap calls for safety) ---
-        try:
-             # Check if data object and necessary attributes exist before plotting
+        
+        try: # Apply the colormaps to the figures
+            # Check if data object and necessary attributes exist before plotting
             if self.data:
                  self.plot_polygone(colors)
                  self.plot_cercle_inscrit(colors)
@@ -121,14 +111,12 @@ class Plotter:
                  self.plot_segment()
                  self.plot_point()
         except AttributeError as e:
-             st.error(f"Plotting error: Missing data attribute - {e}. Check calculations.")
+             st.error(f"Plotting error: Missing data - {e}. Check calculations.")
         except Exception as e:
              st.error(f"An unexpected error occurred during plotting: {e}")
 
-
         return self.fig, self.data
 
-    # --- Plotting Helper Methods ---
     def init_fig(self):
         mpl.rcParams["font.family"] = self.lbl_type
         self.fig, self.ax = plt.subplots(figsize=(8, 8)) 
