@@ -639,13 +639,14 @@ def main():
     # Gallery Tab 
     with tabs[3]:
         st.header("Image Gallery")
+        images_path = [f"image{i}.jpg" for i in range(1, 22)]
         
         for i in range(6): # 6 rows
             cols = st.columns(3)
             for j in range(3): # 3 columns
                 with cols[j]:
-                    random_id = i * 3 + j + 1
-                    st.image(f"https://picsum.photos/400/400?random={random_id}", caption=f"Random Art {random_id}", width=200)
+                    image_id = i + j
+                    st.image(images_path[image_id], width=200)
 
     # Help Tab
     with tabs[4]:
