@@ -642,7 +642,7 @@ def main():
         images_path = [f"image{i}.jpg" for i in range(1, 22)]
 
         k = 0
-        for i in range(6): # 6 rows
+        for i in range(7): # 6 rows
             cols = st.columns(3)
             for j in range(3): # 3 columns
                 with cols[j]:
