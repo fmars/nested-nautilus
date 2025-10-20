@@ -3,6 +3,9 @@ import pandas as pd
 
 
 class Calculs:
+    """
+    Compute the coordinate of the polygons and other data needed.
+    """
     def __init__(self, n, ds, bezier_iterations=4, reverse=False):
         self.n = n # number of sides of the largest polygon
         self.ds = ds # offset
