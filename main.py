@@ -99,15 +99,15 @@ class Plotter:
         try: # Apply the colormaps to the figures
             # Check if data object and necessary attributes exist before plotting
             if self.data:
-                 self.plot_polygone(colors)
-                 self.plot_cercle_inscrit(colors)
-                 self.plot_cercle_circonscrit(colors)
-                 self.plot_cercle_inscrit_circonscrit(colors)
-                 self.plot_spirale()
-                 self.plot_graphe(colors)
+                 self.plot_polygon(colors)
+                 self.plot_circle_inscribed(colors)
+                 self.plot_circle_circumscribed(colors)
+                 self.plot_circle_inscribed_circumscribed(colors)
+                 self.plot_spiral()
+                 self.plot_graph(colors)
                  self.plot_bezier(colors2)
-                 self.plot_cercle(colors)
-                 self.plot_sommets(colors)
+                 self.plot_circle(colors)
+                 self.plot_vertex(colors)
                  self.plot_segment()
                  self.plot_point()
         except AttributeError as e:
@@ -130,11 +130,11 @@ class Plotter:
         self.show_polygone = "Polygon" in self.info.get("display", [])
         self.show_ce_in = "Inscribed Circle" in self.info.get("display", [])
         self.show_ce_circon = "Circumscribed Circle" in self.info.get("display", [])
-        self.show_spirale = "Spiral" in self.info.get("display", [])
+        self.show_spirale = "Polygon Spiral" in self.info.get("display", [])
         self.show_graphe = "Graph" in self.info.get("display", [])
-        self.show_courbe = "Curve" in self.info.get("display", [])
+        self.show_curve = "Bézier Curve" in self.info.get("display", [])
         self.show_cercle = "Circle" in self.info.get("display", [])
-        self.show_sommets = "Vertex" in self.info.get("display", [])
+        self.show_vertex = "Vertex" in self.info.get("display", [])
         self.show_segment = "Segment" in self.info.get("display", [])
         self.show_point = "Point" in self.info.get("display", [])
         
@@ -153,6 +153,7 @@ class Plotter:
 
 
     def random_color_dict(self):    
+        # For random colormap 2
         num_stops = randint(3, 12)
         positions = sorted([random() for _ in range(num_stops)])
         if 0.0 not in positions: positions.insert(0, 0.0)
@@ -165,8 +166,8 @@ class Plotter:
             self.cdict["green"].append((pos, g, g))
             self.cdict["blue"].append((pos, b, b))
 
-    # --- Individual plotting functions (Added safety checks) ---
-    def plot_polygone(self, colors):
+
+    def plot_polygon(self, colors):
         if not self.show_polygone or not hasattr(self.data, 'df_2') or self.data.df_2 is None: return
         # Ensure colors list matches ns length if needed
         safe_colors = colors[:len(self.data.ns)] if hasattr(self.data, 'ns') else []
@@ -188,7 +189,7 @@ class Plotter:
                                     color=c, lw=self.line_thickness, alpha=1, zorder=self.data.n-i) # dropna added
         self.ax.autoscale_view()
 
-    def plot_cercle_inscrit(self, colors):
+    def plot_circle_inscribed(self, colors):
          if not (self.show_ce_in and not self.show_ce_circon) or not hasattr(self.data, 'centres') or not hasattr(self.data, 'in_radii'): return
          transp = 0.6 if self.rempli_polygone and self.show_polygone else 1
          contour_colors = [self.couleur] * len(colors) if self.contour else colors
@@ -201,7 +202,7 @@ class Plotter:
          self.ax.autoscale_view()
 
 
-    def plot_cercle_circonscrit(self, colors):
+    def plot_circle_circumscribed(self, colors):
          if not (self.show_ce_circon and not self.show_ce_in) or not hasattr(self.data, 'centres') or not hasattr(self.data, 'out_radii'): return
          transp = 0.6 if self.rempli_polygone and self.show_polygone else 1
          contour_colors = [self.couleur] * len(colors) if self.contour else colors
@@ -213,7 +214,7 @@ class Plotter:
          self.ax.autoscale_view()
 
 
-    def plot_cercle_inscrit_circonscrit(self, colors):
+    def plot_circle_inscribed_circumscribed(self, colors):
          if not (self.show_ce_circon and self.show_ce_in) or not hasattr(self.data, 'centres') or not hasattr(self.data, 'in_radii') or not hasattr(self.data, 'out_radii'): return
          transp_inscrit, transp_circonscrit = (1, 0.6) if self.rempli_ce_in and self.rempli_ce_circon else (1, 1)
          if self.rempli_polygone and self.show_polygone:
@@ -229,17 +230,17 @@ class Plotter:
          self.ax.autoscale_view()
 
 
-    def plot_spirale(self):
+    def plot_spiral(self):
         if not self.show_spirale: return
         if not hasattr(self.data, 'spiral_x') or not hasattr(self.data, 'spiral_y') or not self.data.spiral_x or not self.data.spiral_y: return
-        to_check = [self.show_polygone, self.show_ce_in, self.show_ce_circon, self.show_courbe,
-                    self.show_cercle, self.show_sommets, self.show_segment, self.show_graphe, self.show_point]
+        to_check = [self.show_polygone, self.show_ce_in, self.show_ce_circon, self.show_curve,
+                    self.show_cercle, self.show_vertex, self.show_segment, self.show_graphe, self.show_point]
         line_color = self.couleur if self.contour and not any(to_check) else self.text_color
         self.ax.plot(self.data.spiral_x, self.data.spiral_y, color=line_color, lw=self.line_thickness, zorder=self.data.n + 1)
         self.ax.autoscale_view()
 
     def plot_bezier(self, colors2):
-         if not self.show_courbe or not hasattr(self.data, 'bezier_pts') or not self.data.bezier_pts: return
+         if not self.show_curve or not hasattr(self.data, 'bezier_pts') or not self.data.bezier_pts: return
          if len(self.data.bezier_pts) < 2: return
          
          # Ensure colors2 has enough elements or handle mismatch
@@ -267,7 +268,7 @@ class Plotter:
              self.ax.autoscale_view()
 
 
-    def plot_cercle(self, colors):
+    def plot_circle(self, colors):
          if not self.show_cercle or not hasattr(self.data, 'ns') or not hasattr(self.data, 'a') or not hasattr(self.data, 'df_2'): return
          patches, edge_colors = [], []
          base_colors = [self.couleur] * len(colors) if self.contour else colors
@@ -289,8 +290,8 @@ class Plotter:
              self.ax.autoscale_view()
 
 
-    def plot_sommets(self, colors):
-         if not self.show_sommets or not hasattr(self.data, 'ns') or not hasattr(self.data, 'centres') or not hasattr(self.data, 'df_2'): return
+    def plot_vertex(self, colors):
+         if not self.show_vertex or not hasattr(self.data, 'ns') or not hasattr(self.data, 'centres') or not hasattr(self.data, 'df_2'): return
          line_colors = [self.couleur] * len(colors) if self.contour else colors
          line_segments, seg_colors = [], []
          min_len = min(len(self.data.ns), len(line_colors), len(self.data.centres))
@@ -316,7 +317,7 @@ class Plotter:
              self.ax.autoscale_view()
 
 
-    def plot_graphe(self, colors):
+    def plot_graph(self, colors):
          if not (self.show_graphe and hasattr(self.data, 'ds') and self.data.ds != 0): return
          if not hasattr(self.data, 'ns') or not hasattr(self.data, 'df_2') or not hasattr(self.data, 'spiral_x') or not self.data.spiral_x: return
 
@@ -349,8 +350,8 @@ class Plotter:
          if not self.show_segment: return
          if not hasattr(self.data, 'ds') or self.data.ds <= 0 or not hasattr(self.data, 'spiral_x') or len(self.data.spiral_x) < 2: return 
          
-         to_check = [self.show_polygone, self.show_ce_in, self.show_ce_circon, self.show_courbe,
-                     self.show_cercle, self.show_sommets, self.show_spirale, self.show_graphe, self.show_point]
+         to_check = [self.show_polygone, self.show_ce_in, self.show_ce_circon, self.show_curve,
+                     self.show_cercle, self.show_vertex, self.show_spirale, self.show_graphe, self.show_point]
          line_color = self.couleur if self.contour and not any(to_check) else "red"
          
          nb = len(self.data.spiral_x)
@@ -398,7 +399,7 @@ class Plotter:
 
 
 
-# --- Streamlit App Main Function ---
+# Streamlit app main function
 def main():
     st.set_page_config(page_title="Polygo'Art") 
 
@@ -410,11 +411,11 @@ def main():
         </style>
         """, unsafe_allow_html=True)
 
-    # --- Sidebar for Controls ---
+    # Sidebar for choosing the parameters
     with st.sidebar:
-        st.title("Polygo'Art")
+        st.title("Nautilus")
         st.caption("Made by Maxime Chevillard") 
-        st.header("⚙️ Controls") # Changed header
+        st.header("Parameters") 
 
         n_sides = st.slider("Number of sides (n)", min_value=3, max_value=100, value=20, step=1)
         ds_offset = st.slider("Spiral offset (ds)", min_value=0, max_value=3, value=1, step=1)
@@ -422,8 +423,8 @@ def main():
         theme_options = ["Random 1", "Random 2", "Spectrum", "Twilight", "Binary", "Flag", "Terrain", "Ocean", "Cividis", "Clown"]
         theme_choice = st.selectbox("Color Theme", theme_options)
 
-        display_options = ["Polygon", "Inscribed Circle", "Circumscribed Circle", "Spiral", "Graph", "Curve", "Circle", "Vertex", "Segment", "Point"]
-        display_final_choices = st.multiselect("Elements to Display", display_options, default=["Polygon", "Spiral"])
+        display_options = ["Polygon", "Inscribed Circle", "Circumscribed Circle", "Polygon Spiral", "Graph", "Bézier Curve", "Circle", "Vertex", "Segment", "Point"]
+        display_final_choices = st.multiselect("Elements to Display", display_options, default=["Polygon", "Polygon Spiral"])
 
         fillable_options = [opt for opt in ["Polygon", "Inscribed Circle", "Circumscribed Circle"] if opt in display_final_choices]
         remplissage_final_choices = []
@@ -441,12 +442,11 @@ def main():
         mode_choice = st.radio("Background Mode", ["light", "dark"], index=0)
 
         st.markdown("---")
-        # --- MODIFICATION: Use width='stretch' ---
         generate_button = st.button("Generate", width='stretch')
 
-        # Download button is here
+        # Download button
         if 'fig' in st.session_state and st.session_state.fig is not None:
-             try: # Add try-except for image saving
+             try: 
                  img_buffer = BytesIO()
                  st.session_state.fig.savefig(
                      img_buffer, 
@@ -456,11 +456,10 @@ def main():
                      facecolor=st.session_state.fig.get_facecolor()
                  )
                  img_buffer.seek(0)
-                 # --- MODIFICATION: Use width='stretch' ---
                  st.download_button(
-                         label="📷 Download Image (PNG)", 
+                         label="Download Image (PNG)", 
                          data=img_buffer, 
-                         file_name=f"polygo_art_n{st.session_state.get('n_sides', 'N')}_ds{st.session_state.get('ds_offset', 'N')}.png", # Use .get for safety
+                         file_name=f"nautilus{st.session_state.get('n_sides', 'N')}_ds{st.session_state.get('ds_offset', 'N')}.png", 
                          mime="image/png",
                          width='stretch', 
                          key="download_sidebar" 
@@ -468,9 +467,7 @@ def main():
              except Exception as e:
                   st.error(f"Error preparing download: {e}")
 
-        # --- END MODIFICATION ---
 
-    # --- Tabs ---
     tabs = st.tabs([
         "🖼️ Generator", "🔬 Bezier Playground", "📊 Data", "🏞️ Gallery", "❓ Help", "📜 Paper"
     ])
