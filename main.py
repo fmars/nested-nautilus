@@ -401,7 +401,7 @@ class Plotter:
 
 # Streamlit app main function
 def main():
-    st.set_page_config(page_title="Polygo'Art") 
+    st.set_page_config(page_title="Nautilus") 
 
     st.markdown("""
         <style>
