@@ -14,7 +14,7 @@ Nautilus is an interactive web application for creating generative art based on 
 * **Generation History**: The app automatically saves your last 21 creations in a session, allowing you to easily revisit and compare them.
 * **Built-in Gallery & Paper Viewer**: Includes a gallery of example images and a PDF viewer to display associated research or documentation.
 
-## ⚙️ Setup and Installation
+## Setup and Installation
 
 To run this application on your local machine, follow these steps:
 
