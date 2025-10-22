@@ -408,10 +408,13 @@ def main():
         initial_sidebar_state="expanded"
     )
 
-    # Include the "#": #MainMenu {visibility: hidden;}
+    # Include the "#"
+    # #MainMenu {visibility: hidden;}
+    # #GithubIcon {visibility: hidden;}
+    # footer {visibility: hidden;}
     hide_streamlit_style = """
             <style>
-            
+            #GithubIcon {visibility: hidden;}
             footer {visibility: hidden;}
             </style>
             """
