@@ -784,9 +784,8 @@ def main():
             ```
             MIT License © 2025 Maxime Chevillard
 
-            Permission is granted to use, copy, modify, and distribute this software,
-            provided the copyright notice is included.
-            The software is provided "as is" without warranty.
+            Permission is granted to use, copy, modify, and distribute 
+            this software, provided the copyright notice is included.
             ```
             """
         )
