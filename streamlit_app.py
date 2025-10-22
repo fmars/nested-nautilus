@@ -465,7 +465,7 @@ def main():
         generate_button = st.button("Generate", width='stretch')
 
     tabs = st.tabs([
-        "Generator", "History", "Data", "Gallery", "Bézier Playground", "Paper", "Help", "Acknoledgement"
+        "Generator", "History", "Data", "Gallery", "Bézier Playground", "Paper", "Help", "Acknowledgements"
     ])
 
 
