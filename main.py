@@ -765,6 +765,7 @@ def main():
 
         st.markdown("Have a great day!")
         st.markdown("*— Maxime Chevillard, Paris*")
+        st.info("Contact: maxime.chevillardsnc@gmail.com")
 
         st.markdown("---")
         st.markdown(
